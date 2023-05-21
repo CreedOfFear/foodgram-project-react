@@ -1,17 +1,16 @@
-from django.db import transaction
-from django.shortcuts import get_object_or_404
-from rest_framework import status
-from djoser.serializers import UserCreateSerializer, UserSerializer
-from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
-from rest_framework.response import Response
 import base64
 
 from django.core.files.base import ContentFile
-from recipes.models import (Favourite, Ingredient,
-                            Recipe, RecipeIngredient,
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+from djoser.serializers import UserCreateSerializer, UserSerializer
+from rest_framework import serializers, status
+from rest_framework.response import Response
+from rest_framework.validators import UniqueTogetherValidator
+
+from recipes.models import (Favourite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
-from users.models import UserFoodgram, Subscription
+from users.models import Subscription, UserFoodgram
 
 
 class Base64ImageField(serializers.ImageField):

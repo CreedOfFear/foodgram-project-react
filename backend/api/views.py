@@ -13,12 +13,12 @@ from api.serializers import (FavouriteSerializer, IngredientSerializer,
                              ShoppingCartSerializer, TagSerialiser,
                              UserSubscribeRepresentSerializer,
                              UserSubscribeSerializer)
+from api.utils import create_model_instance, delete_model_instance
 from recipes.models import (Favourite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
 from users.models import Subscription, UserFoodgram
 
 from .permission import IsAdminAuthorOrReadOnly
-from .serializers import create_model_instance, delete_model_instance
 
 
 class UserSubscribeView(APIView):
@@ -91,9 +91,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return RecipeCreateSerializer
 
     @action(
+        methods=['POST', 'DELETE'],
         detail=True,
-        methods=['post', 'delete'],
-        permission_classes=[IsAuthenticated, ]
+        permission_classes=[IsAuthenticated]
     )
     def favorite(self, request, pk):
         """Работа с избранными рецептами.
@@ -103,7 +103,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             return create_model_instance(request, recipe, FavouriteSerializer)
 
-        if request.method == 'DELETE':
+        else:
             error_message = 'У вас нет этого рецепта в избранном'
             return delete_model_instance(request, Favourite,
                                          recipe, error_message)
@@ -139,13 +139,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ).values(
             'ingredient__name', 'ingredient__measurent_unit'
         ).annotate(ingredient_amount=Sum('amount'))
-        shopping_list = ['Список покупок:\n']
-        for ingredient in ingredients:
-            name = ingredient['ingredient__name']
-            unit = ingredient['ingredient__measurent_unit']
-            amount = ingredient['ingredient_amount']
-            shopping_list.append(f'\n{name} - {amount}, {unit}')
+        shopping_list = ('Список покупок:\n')
+        shopping_list += '\n'.join([
+            f'- {ingredient["ingredient__name"]} '
+            f'({ingredient["ingredient__measurent_unit"]})'
+            f' - {ingredient["ingredient_amount"]}'
+            for ingredient in ingredients
+        ])
+
         response = HttpResponse(shopping_list, content_type='text/plain')
-        response['Content-Disposition'] = \
-            'attachment; filename="shopping_cart.txt"'
+        response['Content-Disposition'] = (
+            'attachment;filename="shopping_cart.txt"'
+            )
         return response

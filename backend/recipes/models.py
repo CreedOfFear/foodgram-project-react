@@ -1,7 +1,8 @@
+from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 
-from users.models import UserFoodgram
+UserFoodgram = get_user_model()
 
 
 class Ingredient(models.Model):
@@ -51,122 +52,112 @@ class Tag(models.Model):
 class Recipe(models.Model):
     author = models.ForeignKey(
         UserFoodgram,
-        verbose_name='Автор рецепта',
+        verbose_name="Автор рецепта",
         on_delete=models.CASCADE
-        
+
     )
     ingredients = models.ManyToManyField(
         Ingredient,
-        through='RecipeIngredient',
-        verbose_name='Ингредиенты',
-        related_name='recipes'
+        through="RecipeIngredient",
+        verbose_name="Ингредиенты",
+        related_name="recipes"
     )
     tags = models.ManyToManyField(
         Tag,
-        verbose_name='Список id тегов',
-        related_name='tags',
+        verbose_name="Список id тегов",
+        related_name="tags",
     )
     image = models.ImageField(
-        upload_to='api/images',
-        verbose_name='Картинка,закодированная в Base64',
+        upload_to="api/images",
+        verbose_name="Картинка,закодированная в Base64",
     )
     name = models.CharField(
         max_length=200,
-        verbose_name='Название',
+        verbose_name="Название",
         )
     text = models.TextField(
-        verbose_name='Описание'
+        verbose_name="Описание"
     )
     cooking_time = models.PositiveSmallIntegerField(
-        verbose_name='Время приготовления (в минутах)'
+        verbose_name="Время приготовления (в минутах)"
     )
 
     def __str__(self):
         return self.name
-    
+
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        verbose_name='Рецепт',
-        related_name='recipeingredients',
+        verbose_name="Рецепт",
+        related_name="recipeingredients",
 
     )
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        verbose_name='Ингредиент',
-        related_name='recipeingredients',
+        verbose_name="Ингредиент",
+        related_name="recipeingredients",
     )
-    amount = models.IntegerField(
-        'Количество',
+    amount = models.PositiveSmallIntegerField(
+        "Количество",
         validators=[
             MinValueValidator(
-                1, 'Количество ингредиентов не может быть меньше 1'
+                1, "Количество ингредиентов не может быть меньше 1"
             )
         ]
     )
 
     class Meta:
-        verbose_name = 'Ингредиент в рецепте'
-        verbose_name_plural = 'Ингредиенты в рецепте'
+        verbose_name = "Ингредиент в рецепте"
+        verbose_name_plural = "Ингредиенты в рецепте"
 
 
 class Favourite(models.Model):
     user = models.ForeignKey(
         UserFoodgram,
         on_delete=models.CASCADE,
-        related_name='favorites',
-        verbose_name='Пользователь',
+        related_name="favorites",
+        verbose_name="Пользователь",
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='favorites',
-        verbose_name='Рецепт',
+        related_name="favorites",
+        verbose_name="Рецепт",
     )
 
     class Meta:
-        ordering = ['-id']
-        constraints = [
-            models.UniqueConstraint(
-                fields=['user', 'recipe'],
-                name='unique_user_recipe_favorite'
-            )
-        ]
-        verbose_name = 'Избранное'
-        verbose_name_plural = 'Избранное'
+        ordering = ["-id"]
+        verbose_name = "Избранное"
+        verbose_name_plural = "Избранное"
 
     def __str__(self):
-        return f'{self.user.username} добавил {self.recipe.name} в избраннное'
+        return f"{self.user.username} добавил {self.recipe.name} в избраннное"
 
 
 class ShoppingCart(models.Model):
     user = models.ForeignKey(
         UserFoodgram,
         on_delete=models.CASCADE,
-        related_name='carts',
-        verbose_name='Пользователь'
+        related_name="carts",
+        verbose_name="Пользователь"
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='carts',
-        verbose_name='Рецепт'
+        related_name="carts",
+        verbose_name="Рецепт"
     )
 
     class Meta:
-        ordering = ['-id']
-        constraints = [
-            models.UniqueConstraint(
-                fields=['user', 'recipe'],
-                name='unique_user_recipe_cart'
-            )
-        ]
-        verbose_name = 'Список покупок'
-        verbose_name_plural = 'Списки покупок'
+        ordering = ["-id"]
+        verbose_name = "Список покупок"
+        verbose_name_plural = "Списки покупок"
 
     def __str__(self):
-        return (f'{self.user.username} добавил'
-                f'{self.recipe.name} в список покупок')
+        return (
+            f"{self.user.username} добавил"
+            f"{self.recipe.name} в список покупок"
+            )

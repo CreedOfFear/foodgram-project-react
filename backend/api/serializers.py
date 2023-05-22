@@ -1,84 +1,27 @@
-import base64
-
-from django.core.files.base import ContentFile
 from django.db import transaction
-from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from rest_framework import serializers, status
-from rest_framework.response import Response
+from drf_extra_fields.fields import Base64ImageField
+from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
+from api.utils import create_ingredients
 from recipes.models import (Favourite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
 from users.models import Subscription, UserFoodgram
-
-
-class Base64ImageField(serializers.ImageField):
-    def to_internal_value(self, data):
-        # Если полученный объект строка, и эта строка 
-        # начинается с 'data:image'...
-        if isinstance(data, str) and data.startswith('data:image'):
-            # ...начинаем декодировать изображение из base64.
-            # Сначала нужно разделить строку на части.
-            format, imgstr = data.split(';base64,')  
-            # И извлечь расширение файла.
-            ext = format.split('/')[-1]  
-            # Затем декодировать сами данные и поместить результат в файл,
-            # которому дать название по шаблону.
-            data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
-
-        return super().to_internal_value(data)
-    
-
-def create_ingredients(ingredients, recipe):
-    """Вспомогательная функция для добавления ингредиентов.
-    Используется при создании/редактировании рецепта."""
-    ingredient_list = []
-    for ingredient in ingredients:
-        current_ingredient = get_object_or_404(Ingredient,
-                                               id=ingredient.get('id'))
-        amount = ingredient.get('amount')
-        ingredient_list.append(
-            RecipeIngredient(
-                recipe=recipe,
-                ingredient=current_ingredient,
-                amount=amount
-            )
-        )
-    RecipeIngredient.objects.bulk_create(ingredient_list)
-
-
-def create_model_instance(request, instance, serializer_name):
-    """Вспомогательная функция для добавления
-    рецепта в избранное либо список покупок.
-    """
-    serializer = serializer_name(
-        data={'user': request.user.id, 'recipe': instance.id, },
-        context={'request': request}
-    )
-    serializer.is_valid(raise_exception=True)
-    serializer.save()
-    return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-def delete_model_instance(request, model_name, instance, error_message):
-    """Вспомогательная функция для удаления рецепта
-    из избранного либо из списка покупок.
-    """
-    if not model_name.objects.filter(user=request.user,
-                                     recipe=instance).exists():
-        return Response({'errors': error_message},
-                        status=status.HTTP_400_BAD_REQUEST)
-    model_name.objects.filter(user=request.user, recipe=instance).delete()
-    return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserSignUpSerializer(UserCreateSerializer):
     """Сериализатор для регистрации пользователей."""
     class Meta:
         model = UserFoodgram
-        fields = ('email', 'id', 'username', 'first_name',
-                  'last_name', 'password')
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'password'
+            )
 
 
 class UserGetSerializer(UserSerializer):
@@ -87,15 +30,22 @@ class UserGetSerializer(UserSerializer):
 
     class Meta:
         model = UserFoodgram
-        fields = ('email', 'id', 'username', 'first_name',
-                  'last_name', 'is_subscribed')
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed'
+            )
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
-        return (request.user.is_authenticated
-                and Subscription.objects.filter(
-                    user=request.user, author=obj
-                ).exists())
+        return (
+            request.user.is_authenticated
+            and Subscription.objects.filter(
+                user=request.user, author=obj
+            ).exists())
 
 
 class RecipeSmallSerializer(serializers.ModelSerializer):
@@ -115,10 +65,25 @@ class UserSubscribeRepresentSerializer(UserGetSerializer):
 
     class Meta:
         model = UserFoodgram
-        fields = ('email', 'id', 'username', 'first_name',
-                  'last_name', 'is_subscribed', 'recipes', 'recipes_count')
-        read_only_fields = ('email', 'username', 'first_name', 'last_name',
-                            'is_subscribed', 'recipes', 'recipes_count')
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+            'recipes',
+            'recipes_count'
+            )
+        read_only_fields = (
+            'email',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+            'recipes',
+            'recipes_count'
+            )
 
     def get_recipes(self, obj):
         request = self.context.get('request')
@@ -128,8 +93,11 @@ class UserSubscribeRepresentSerializer(UserGetSerializer):
         recipes = obj.recipes.all()
         if recipes_limit:
             recipes = obj.recipes.all()[:int(recipes_limit)]
-        return RecipeSmallSerializer(recipes, many=True,
-                                     context={'request': request}).data
+        return RecipeSmallSerializer(
+            recipes,
+            many=True,
+            context={'request': request}
+            ).data
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()

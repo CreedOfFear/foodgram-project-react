@@ -13,12 +13,13 @@ from api.serializers import (FavouriteSerializer, IngredientSerializer,
                              ShoppingCartSerializer, TagSerialiser,
                              UserSubscribeRepresentSerializer,
                              UserSubscribeSerializer)
-from api.utils import create_model_instance, delete_model_instance
+from api.utils import create_model_instance, delete_model_instance, get_list_ingredients
 from recipes.models import (Favourite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
 from users.models import Subscription, UserFoodgram
 
 from .permission import IsAdminAuthorOrReadOnly
+from rest_framework import status
 
 
 class UserSubscribeView(APIView):
@@ -101,12 +102,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """
         recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
-            return create_model_instance(request, recipe, FavouriteSerializer)
+            return create_model_instance(request, recipe, FavouriteSerializer,) 
 
         else:
             error_message = 'У вас нет этого рецепта в избранном'
-            return delete_model_instance(request, Favourite,
-                                         recipe, error_message)
+            return delete_model_instance(
+                request,
+                Favourite,
+                recipe,
+                error_message
+            )
 
     @action(
         detail=True,
@@ -119,35 +124,29 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """
         recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
-            return create_model_instance(request, recipe,
-                                         ShoppingCartSerializer)
+            return create_model_instance(
+                request,
+                recipe,
+                ShoppingCartSerializer
+            )
 
-        if request.method == 'DELETE':
+        else:
             error_message = 'У вас нет этого рецепта в списке покупок'
-            return delete_model_instance(request, ShoppingCart,
-                                         recipe, error_message)
+            return delete_model_instance(
+                request,
+                ShoppingCart,
+                recipe,
+                error_message
+            )
 
     @action(
         detail=False,
-        methods=['get'],
-        permission_classes=[IsAuthenticated, ]
     )
     def download_shopping_cart(self, request):
         """Отправка файла со списком покупок."""
-        ingredients = RecipeIngredient.objects.filter(
-            recipe__carts__user=request.user
-        ).values(
-            'ingredient__name', 'ingredient__measurent_unit'
-        ).annotate(ingredient_amount=Sum('amount'))
-        shopping_list = ('Список покупок:\n')
-        shopping_list += '\n'.join([
-            f'- {ingredient["ingredient__name"]} '
-            f'({ingredient["ingredient__measurent_unit"]})'
-            f' - {ingredient["ingredient_amount"]}'
-            for ingredient in ingredients
-        ])
+        result = get_list_ingredients(request.user)
 
-        response = HttpResponse(shopping_list, content_type='text/plain')
+        response = HttpResponse(result, content_type='text/plain')
         response['Content-Disposition'] = (
             'attachment;filename="shopping_cart.txt"'
             )

@@ -13,7 +13,7 @@ class Ingredient(models.Model):
     measurent_unit = models.CharField(
         max_length=200,
         blank=False,
-        )
+    )
 
     class Meta:
         verbose_name = "Ингридиент"
@@ -34,7 +34,7 @@ class Tag(models.Model):
         default="#ffffff",
         verbose_name="Цвет",
         help_text="Укажите цвет тега в HEX коде,например:#2200fe "
-        )
+    )
     slug = models.SlugField(
         verbose_name="Слаг",
         unique=True,
@@ -74,7 +74,7 @@ class Recipe(models.Model):
     name = models.CharField(
         max_length=200,
         verbose_name="Название",
-        )
+    )
     text = models.TextField(
         verbose_name="Описание"
     )
@@ -160,4 +160,4 @@ class ShoppingCart(models.Model):
         return (
             f"{self.user.username} добавил"
             f"{self.recipe.name} в список покупок"
-            )
+        )

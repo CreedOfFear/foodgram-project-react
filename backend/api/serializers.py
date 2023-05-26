@@ -20,7 +20,7 @@ class UserSignUpSerializer(UserCreateSerializer):
             "first_name",
             "last_name",
             "password"
-            )
+        )
 
 
 class UserGetSerializer(UserSerializer):
@@ -36,7 +36,7 @@ class UserGetSerializer(UserSerializer):
             "first_name",
             "last_name",
             "is_subscribed"
-            )
+        )
 
     def get_is_subscribed(self, obj):
         request = self.context.get("request")
@@ -56,7 +56,7 @@ class RecipeSmallSerializer(serializers.ModelSerializer):
             "name",
             "image",
             "cooking_time"
-            )
+        )
 
 
 class UserSubscribeRepresentSerializer(UserGetSerializer):
@@ -78,7 +78,7 @@ class UserSubscribeRepresentSerializer(UserGetSerializer):
             "is_subscribed",
             "recipes",
             "recipes_count"
-            )
+        )
         read_only_fields = (
             "email",
             "username",
@@ -87,7 +87,7 @@ class UserSubscribeRepresentSerializer(UserGetSerializer):
             "is_subscribed",
             "recipes",
             "recipes_count"
-            )
+        )
 
     def get_recipes(self, obj):
         request = self.context.get("request")
@@ -101,7 +101,7 @@ class UserSubscribeRepresentSerializer(UserGetSerializer):
             recipes,
             many=True,
             context={"request": request}
-            ).data
+        ).data
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
@@ -144,7 +144,7 @@ class TagSerialiser(serializers.ModelSerializer):
             "name",
             "color",
             "slug"
-            )
+        )
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -172,7 +172,7 @@ class IngredientGetSerializer(serializers.ModelSerializer):
             "name",
             "measurent_unit",
             "amount"
-            )
+        )
 
 
 class IngredientPostSerializer(serializers.ModelSerializer):
@@ -187,7 +187,7 @@ class IngredientPostSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "amount"
-            )
+        )
 
 
 class RecipeGetSerializer(serializers.ModelSerializer):
@@ -227,7 +227,7 @@ class RecipeGetSerializer(serializers.ModelSerializer):
         return (
             request and request.user.is_authenticated
             and ShoppingCart.objects.filter(
-                    user=request.user, recipe=obj
+                user=request.user, recipe=obj
             ).exists())
 
 

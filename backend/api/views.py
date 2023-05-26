@@ -149,7 +149,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        elif self.request.method == "DELETE":
+        if self.request.method == "DELETE":
             self.delete_shopping_cart(user, recipe)
             return Response(status=status.HTTP_204_NO_CONTENT)
 

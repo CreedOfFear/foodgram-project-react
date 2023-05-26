@@ -1,18 +1,11 @@
+from api.utils import create_ingredients
 from django.db import transaction
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
+from recipes.models import (Favourite, Ingredient, Recipe, RecipeIngredient,
+                            ShoppingCart, Tag)
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
-
-from api.utils import create_ingredients
-from recipes.models import (
-    Favourite,
-    Ingredient,
-    Recipe,
-    RecipeIngredient,
-    ShoppingCart,
-    Tag
-    )
 from users.models import Subscription, UserFoodgram
 
 

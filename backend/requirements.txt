@@ -8,3 +8,4 @@ djoser
 djangorestframework-simplejwt
 django-filter
 pillow
+gunicorn

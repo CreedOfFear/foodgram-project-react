@@ -158,10 +158,11 @@ class IngredientGetSerializer(serializers.ModelSerializer):
     """Сериализатор для получения информации об ингредиентах.
     Используется при работе с рецептами.
     """
-    id = serializers.IntegerField(source="ingredient.id", read_only=True)
+    id = serializers.PrimaryKeyRelatedField(
+        source='ingredient.id', read_only=True)
     name = serializers.CharField(source="ingredient.name", read_only=True)
-    measurent_unit = serializers.CharField(
-        source="ingredient.measurent_unit",
+    measurement_unit = serializers.CharField(
+        source="ingredient.measurement_unit",
         read_only=True
     )
 
@@ -170,7 +171,7 @@ class IngredientGetSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "name",
-            "measurent_unit",
+            "measurement_unit",
             "amount"
         )
 

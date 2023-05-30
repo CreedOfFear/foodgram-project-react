@@ -1,9 +1,9 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from django.urls import reverse
+from django.utils.html import format_html
 from recipes.models import Ingredient, Recipe, Tag
 from users.models import UserFoodgram
-from django.contrib.auth.admin import UserAdmin
-from django.utils.html import format_html
-from django.urls import reverse
 
 admin.site.register(Tag)
 admin.site.register(Recipe)

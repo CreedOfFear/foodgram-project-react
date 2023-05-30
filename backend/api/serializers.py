@@ -89,20 +89,16 @@ class UserSubscribeRepresentSerializer(UserGetSerializer):
             "recipes_count"
         )
 
-    def get_recipes(self, obj):
-        request = self.context.get("request")
-        recipes_limit = None
-        if request:
-            recipes_limit = request.query_params.get("recipes_limit")
-        recipes = obj.recipes.all()
-        if recipes_limit:
-            recipes = obj.recipes.all()[:int(recipes_limit)]
-        return RecipeSmallSerializer(
-            recipes,
-            many=True,
-            context={"request": request}
-        ).data
+    def get_recipes(self, object):
+        request = self.context.get('request')
+        context = {'request': request}
+        recipe_limit = request.query_params.get('recipe_limit')
+        queryset = object.recipes.all()
+        if recipe_limit:
+            queryset = queryset[:int(recipe_limit)]
 
+        return RecipeSmallSerializer(queryset, context=context, many=True).data
+    
     def get_recipes_count(self, obj):
         return obj.recipes.count()
 
@@ -115,11 +111,11 @@ class UserSubscribeSerializer(serializers.ModelSerializer):
         validators = [
             UniqueTogetherValidator(
                 queryset=Subscription.objects.all(),
-                fields=("user", "author"),
-                message="Вы уже подписаны на этого пользователя"
+                fields=('user', 'author'),
+                message='Вы уже подписаны на этого пользователя'
             )
         ]
-
+    
     def validate(self, data):
         request = self.context.get("request")
         if request.user == data["author"]:

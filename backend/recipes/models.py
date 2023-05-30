@@ -62,6 +62,7 @@ class Recipe(models.Model):
     author = models.ForeignKey(
         UserFoodgram,
         verbose_name="Автор рецепта",
+        related_name='recipes',
         on_delete=models.CASCADE
 
     )

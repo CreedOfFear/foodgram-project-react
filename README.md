@@ -25,13 +25,13 @@ $ docker-compose up -d --build
 ```
 - Выполнить команды для миграции, создания суперюзера и сбора статики:
 ```
-docker-compose exec web python manage.py migrate
-docker-compose exec web python manage.py createsuperuser
-docker-compose exec web python manage.py collectstatic --no-input
+docker-compose exec backend python manage.py migrate
+docker-compose exec backend python manage.py createsuperuser
+docker-compose exec backend python manage.py collectstatic --no-input
 ```
 - Загрузить список ингредиентов из csv файла:
 ```
-docker-compose exec web python manage.py upload
+docker-compose exec backend python manage.py upload
 ```
 
 ### Пример наполнения env файла

@@ -9,10 +9,12 @@ class Ingredient(models.Model):
     name = models.CharField(
         max_length=200,
         blank=False,
+        verbose_name='Название'
     )
     measurement_unit = models.CharField(
         max_length=200,
         blank=False,
+        verbose_name='Единица измерения'
     )
 
     class Meta:
@@ -82,8 +84,8 @@ class Recipe(models.Model):
         verbose_name="Картинка,закодированная в Base64",
     )
     pub_date = models.DateTimeField(
-        'Дата публикации',
-        auto_now_add=True
+        auto_now_add=True,
+        verbose_name='Дата публикации'
     )
     name = models.CharField(
         max_length=200,
@@ -121,6 +123,7 @@ class RecipeIngredient(models.Model):
     )
     amount = models.PositiveSmallIntegerField(
         "Количество",
+        verbose_name="Количество",
         validators=[
             MinValueValidator(
                 1, "Количество ингредиентов не может быть меньше 1"

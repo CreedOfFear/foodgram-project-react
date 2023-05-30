@@ -98,7 +98,7 @@ class UserSubscribeRepresentSerializer(UserGetSerializer):
             queryset = queryset[:int(recipe_limit)]
 
         return RecipeSmallSerializer(queryset, context=context, many=True).data
-    
+
     def get_recipes_count(self, obj):
         return obj.recipes.count()
 
@@ -115,7 +115,7 @@ class UserSubscribeSerializer(serializers.ModelSerializer):
                 message='Вы уже подписаны на этого пользователя'
             )
         ]
-    
+
     def validate(self, data):
         request = self.context.get("request")
         if request.user == data["author"]:

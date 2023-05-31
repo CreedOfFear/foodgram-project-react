@@ -32,7 +32,7 @@ docker-compose exec backend python manage.py collectstatic --no-input
 ```
 - Загрузить список ингредиентов:
 ```
-docker-compose exec backend python manage.py upload
+docker-compose exec backend python manage.py loaddata data/dump.json
 ```
 
 ### Пример наполнения env файла

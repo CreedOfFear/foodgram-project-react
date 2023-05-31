@@ -1,10 +1,12 @@
+![](https://github.com/CreedOfFear/foodgram-project-react
+/actions/workflows/main.yml/badge.svg)
 # Foodgram
 
  Продуктовый помощник - дипломный проект курса Backend-разработки Яндекс.Практикум. Проект представляет собой онлайн-сервис и API для него. На этом сервисе пользователи могут публиковать рецепты, подписываться на публикации других пользователей, добавлять понравившиеся рецепты в список «Избранное», а перед походом в магазин скачивать сводный список продуктов, необходимых для приготовления одного или нескольких выбранных блюд.
 
 Проект реализован на `Django` и `DjangoRestFramework`. Доступ к данным реализован через API-интерфейс. Документация к API написана с использованием `Redoc`.
 
-Айпи адрес сайта: http://158.160.107.155/
+Айпи адрес сайта: http://130.193.38.250/
 
 ## Технологии:
 - [Django](https://www.djangoproject.com/)
@@ -29,7 +31,7 @@ docker-compose exec backend python manage.py migrate
 docker-compose exec backend python manage.py createsuperuser
 docker-compose exec backend python manage.py collectstatic --no-input
 ```
-- Загрузить список ингредиентов из csv файла:
+- Загрузить список ингредиентов:
 ```
 docker-compose exec backend python manage.py upload
 ```
